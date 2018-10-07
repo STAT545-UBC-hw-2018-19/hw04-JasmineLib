@@ -1,0 +1,34 @@
+---
+title: "STAT545_hw04_JasmineLib"
+output: github_document
+---
+### STAT 545 Homework 4
+```{r}
+suppressPackageStartupMessages(library(tidyverse)) 
+suppressPackageStartupMessages(library(gapminder))
+```
+
+```{r}
+test = gapminder %>% 
+  select (year, lifeExp, country) %>% 
+  filter (country == "China" | country == "India" | country == "Japan") %>% 
+   spread(key = "country", value = "lifeExp")
+test
+
+class(test)
+
+test  %>% 
+  knitr::kable()
+  
+
+test %>%
+  ggplot (aes(China, India)) + 
+  geom_point(aes(colour = year)) + 
+  theme_classic() +
+  ggtitle("Life Expectancy in China vs. Canada") +
+  scale_y_continuous(breaks = seq(30,70, by=5)) +
+  scale_x_continuous(breaks = seq(30,70, by=5)) +
+  geom_abline(mapping = NULL, data = NULL, slope = 1, yintercept = 0, xintercept = 0,
+  na.rm = FALSE)
+```
+
