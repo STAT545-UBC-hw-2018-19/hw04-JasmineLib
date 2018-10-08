@@ -3,6 +3,9 @@ title: "STAT545_hw04_JasmineLib"
 output: github_document
 ---
 ### STAT 545 Homework 4
+
+Data Reshaping Prompts (and relationship to aggregation)
+
 ```{r}
 suppressPackageStartupMessages(library(tidyverse)) 
 suppressPackageStartupMessages(library(gapminder))
@@ -25,10 +28,44 @@ test %>%
   ggplot (aes(China, India)) + 
   geom_point(aes(colour = year)) + 
   theme_classic() +
-  ggtitle("Life Expectancy in China vs. Canada") +
+  ggtitle("Life Expectancy in China vs. India") +
+  labs(x = "China Life Expectancy (Years)", y = "India Life Expectancy (Years)")
   scale_y_continuous(breaks = seq(30,70, by=5)) +
   scale_x_continuous(breaks = seq(30,70, by=5)) +
-  geom_abline(mapping = NULL, data = NULL, slope = 1, yintercept = 0, xintercept = 0,
-  na.rm = FALSE)
+  geom_abline(mapping = NULL, data = NULL, slope = 1,
+  na.rm = FALSE) +
+  theme(aspect.ratio=1)
+```
+
+Join Prompts (join, merge, look up)
+
+Activity #1
+
+Create a second data frame, complementary to Gapminder. Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result. Explore the different types of joins. Examples of a second data frame you could build:
+One row per country, a country variable and one or more variables with extra info, such as language spoken, NATO membership, national animal, or capitol city.
+One row per continent, a continent variable and one or more variables with extra info, such as northern versus southern hemisphere.
+```{r}
+#Obtained data from: https://www.gapminder.org/data/
+numHIV = read_csv(file = "people_living_with_hiv_number_all_ages.csv")
+
+gapminder_sel = gapminder %>% 
+  filter (year == "2007") %>% 
+  select(country = "country", pop, gdpPercap) #select the population and gdpPercap data for the year 2007. 
+  #filter(country =="Canada" | country == "Japan" | country =="India")
+
+
+gapminder_sel 
+
+numHIV_sel =numHIV %>% 
+  select(geo, "2007") #rename the "geo" column to country to make joining easier, and select data for the year 2007. 
+  #filter(geo =="Canada" | geo == "Japan" | geo =="India")
+ 
+class(gapminder$country)
+class(numHIV$geo)
+
+gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= c("country" = "geo"))
+gapminderHIV
+
+
 ```
 
