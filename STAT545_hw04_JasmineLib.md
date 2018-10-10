@@ -6,7 +6,7 @@ STAT 545 Homework 4
 
 #### In this assignment I chose the following two activities:
 
-**Data Reshaping Prompt - Activity \#2: ** - Make a tibble with one row per year and columns for life expectancy for two or more countries.
+**Data Reshaping Prompt - Activity \#2:** - Make a tibble with one row per year and columns for life expectancy for two or more countries.
 - Use knitr::kable() to make this table look pretty in your rendered homework.
 - Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
 
