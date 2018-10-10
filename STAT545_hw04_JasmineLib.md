@@ -380,3 +380,48 @@ gapminderHIV_revanti = anti_join(numHIV_sel, gapminder_sel, by = "country" )
     ## [1] 28
 
 -   We can see that 28 countries are found in the HIV dataset, but not in gapminder. Some of those countries are shown above using the head() function.
+
+#### Extra activity:3
+
+-   Explore the base R function merge(), which also does joins. Compare and contrast with dplyr joins.
+
+``` r
+gapminderHIV_merge = merge(numHIV_sel, gapminder_sel, by = "country" )
+
+  head(gapminderHIV_merge) %>% 
+  knitr::kable()
+```
+
+| country     | geo         |    2007|        pop|   gdpPercap| continent |
+|:------------|:------------|-------:|----------:|-----------:|:----------|
+| Afghanistan | Afghanistan |    3600|   31889923|    974.5803| Asia      |
+| Angola      | Angola      |  190000|   12420476|   4797.2313| Africa    |
+| Argentina   | Argentina   |   83000|   40301927|  12779.3796| Americas  |
+| Australia   | Australia   |   18000|   20434176|  34435.3674| Oceania   |
+| Austria     | Austria     |   12000|    8199783|  36126.4927| Europe    |
+| Bangladesh  | Bangladesh  |    4800|  150448339|   1391.2538| Asia      |
+
+``` r
+  gapminderHIV_inner = inner_join(numHIV_sel, gapminder_sel, by = "country" )
+```
+
+    ## Warning: Column `country` joining character vector and factor, coercing
+    ## into character vector
+
+``` r
+  head(gapminderHIV_inner) %>% 
+  knitr::kable()
+```
+
+| geo         |    2007| country     |        pop|   gdpPercap| continent |
+|:------------|-------:|:------------|----------:|-----------:|:----------|
+| Afghanistan |    3600| Afghanistan |   31889923|    974.5803| Asia      |
+| Angola      |  190000| Angola      |   12420476|   4797.2313| Africa    |
+| Argentina   |   83000| Argentina   |   40301927|  12779.3796| Americas  |
+| Australia   |   18000| Australia   |   20434176|  34435.3674| Oceania   |
+| Austria     |   12000| Austria     |    8199783|  36126.4927| Europe    |
+| Bangladesh  |    4800| Bangladesh  |  150448339|   1391.2538| Asia      |
+
+conclude:
+- It appears that the merge function has merged the rows from the gapminder and HIV dataset nicely
+- merge() appears to work similar to inner\_join, where it matches only rows found in both sets, though the position "geo" and "country" columns are reversed, suggesting the "direction" or "order" in which the comparison and joining is done is different.
