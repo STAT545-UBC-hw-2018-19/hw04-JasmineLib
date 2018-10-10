@@ -25,60 +25,85 @@ suppressPackageStartupMessages(library(gapminder))
 ```
 
 
+
 ###Data Reshaping Prompts (and relationship to aggregation) - Activity #2
 
-Section 1: Make a tibble with one row per year and columns for life expectancy for two or more countries.
-```{r}
+**Section 1**: Make a tibble with one row per year and columns for life expectancy for two or more countries.
+```{r filter gapminder}
 filter_gapminder = gapminder %>% 
-  select (year, lifeExp, country) %>% #select specific variables of interest
-  filter (country == "China" | country == "India" | country == "Japan" ) %>% #select countries of interest
-   spread(key = "country", value = "lifeExp")
-
-filter_gapminder
+  select(year, lifeExp, country) %>% #select specific variables of interest
+  filter(country == "China" | country == "India" | country == "Japan" ) %>% #select countries
+  spread(key = "country", value = "lifeExp")
 
 ```
 
 
-Section 2: Use knitr::kable() to make this table look pretty in your rendered homework.  
-```{r}
+**Section 2**: Use knitr::kable() to make this table look pretty.  
+```{r table gapminder filtered}
 filter_gapminder  %>% 
   knitr::kable()
-  
 
 ```
 
-Section 3: Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.  
+**Section 3**: Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.  
 - I am curious to compare the life expectancy of China and India over time.   
-- I plot another line with a slope of 1, intercept (0,0) to help with visualization.   
+- I also plot another line with a slope of 1 to help with visualization & comparison.   
 - Points to the left of this line signify that India (y-axis) has a higher life expectancy for the year,  
-- points on the right of the line signify that China (x-axis) had a higher life expectancy for that year.   
+- Points on the right of the line signify that China (x-axis) had a higher life expectancy for that year.   
 
-```{r}
+```{r China vs. India life exp}
 
 filter_gapminder %>% 
-  ggplot (aes(China, India)) + #plot life expectancy of China and India
-  geom_point(aes(colour = year)) + #legend helps show the direction/flow of time
+  ggplot (aes(x = China, y= India)) + #plot lifeexp of China and India
+  geom_point(aes(colour = year)) + #additional colour visual to show flow of time.
   theme_classic() + 
+  geom_text(aes(label = year, vjust = -0.5), size = 3)+ #add year labels for more clarity.
   ggtitle("Life Expectancy in China vs. India") +
-  labs(x = "China Life Expectancy (Years)", y = "India Life Expectancy (Years)") +
-  scale_y_continuous(breaks=seq(from = 25, to =75, by=5)) + #fix the axis tick marks
-  scale_x_continuous(breaks=seq(25,75, by=5)) +
+  labs(x = "China Life Expectancy (Years)", 
+       y = "India Life Expectancy (Years)") +
+  coord_cartesian(xlim = c(35, 75), ylim =c(35,75)) + #set same axis ticks on x & y axis.
   geom_abline(mapping = NULL, data = NULL, slope = 1, #add line (see explanation above)
   na.rm = FALSE) +
-  theme(aspect.ratio=1) #a square plot is ideal for comparison in this plot. 
-```
+  theme(aspect.ratio=1) #square plot is ideal for comparison in this case. 
 
+
+```
+Conclude:   
+- Historically, China has had a higher life expectancy than India.   
+- We also see an interesting change in years 1952-1962, where China's life expectancy went up, then down, while India's increased (albeit, still remaining below that of China)
+
+We can compare China and Japan
+```{r China vs. Japan Life exp}
+
+filter_gapminder %>% 
+  ggplot (aes(x = China, y= Japan)) + #plot lifeexp of China and Japan
+  geom_point(aes(colour = year)) + #additional colour visual to show flow of time.
+  theme_classic() + 
+  geom_text(aes(label = year, vjust = -0.5), size = 3)+ #add year labels for more clarity.
+  ggtitle("Life Expectancy in China vs. Japan") +
+  labs(x = "China Life Expectancy (Years)", 
+       y = "Japan Life Expectancy (Years)") +
+  coord_cartesian(xlim = c(40, 85), ylim =c(40,85)) + #set same axis ticks on x & y axis.
+  geom_abline(mapping = NULL, data = NULL, slope = 1, #add line
+  na.rm = FALSE) +
+  theme(aspect.ratio=1) # a square plot is better to compare
+
+```
+  
+Conclude: 
+- Historically, Japan has had a higher life expectancy than China.   
+- In the years 1952-1962, the Japanese life expectancy increased, while that of China nearly stayed the same. 
 
 
 ###Join Prompts (join, merge, look up) Activity #1
 
-Section 1: Create a second data frame, complementary to Gapminder.   
-
-I obtained data from the gapminder website, where you can find plenty of interesting data! [Check it out!](https://www.gapminder.org/data/)
-The file that I used is a CSV file named "people_living_with_HIV_number_all_ages.csv" You might need to add it to your environment in order to access it. 
+**Section 1:** Create a second data frame, complementary to Gapminder.   
+- Obtained data from the gapminder website, where you can find plenty of interesting data! [Check it out!](https://www.gapminder.org/data/)  
+- The file I used is a CSV file named "people_living_with_HIV_number_all_ages.csv"   
+- You might need to add it to your R environment in order to run the code. 
 
 The data after selection contains the total number of people living with HIV in 2007, for each country. 
-```{r}
+```{r HIV dataframe}
 #Obtained data from: https://www.gapminder.org/data/
 numHIV = read_csv(file = "people_living_with_hiv_number_all_ages.csv")
 
@@ -87,16 +112,17 @@ numHIV_sel = numHIV %>%
   select(geo, `2007`) %>% 
   mutate(country = geo) #add a variable called country, to facilitate joining (same variable name)
 
-head(numHIV_sel)
-
-
+knitr::kable(head(numHIV_sel))
 ```
+  
+- The head() function shows me the first few rows of data in the selective HIV dataset numHIV_sel. 
 
-Section 2: Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result.
+
+**Section 2**: Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result.
 
 First, I need to filter gapminder to select data only from 2007. 
 - I create a table with the first few rows here to ensure I filtered the variables I want. 
-```{r}
+```{r gapminder select part2}
 gapminder_sel = gapminder %>% 
   filter (year == "2007") %>% 
   select(country = "country", pop, gdpPercap, continent) #select the population and gdpPercap data for the year 2007. 
@@ -106,73 +132,116 @@ gapminder_sel %>%
   knitr::kable()
 
 ```
+  
+- The head() function shows me the first few rows in the selective gapminder dataset (gapminder_sel) 
+- I also notice that some of the countries in gapminder_sel do not correspond to the numHIV_sel and vice versa (I explore the consequences of this finding later on). 
 
-Create a new data frame gapminder HIV which joins the gapminder_sel and numHIV_sel: 
-- I use head(gapminderHIV) to ensure that the join worked. 
-- I notice that some data is missing, but that's okay, we can remove the NAs later on.
-```{r}
-gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= "country") # join columns, join by comparing country and geo columns. 
 
-gapminderHIV
+Create a new data frame called gapminder_HIV which joins the gapminder_sel and numHIV_sel:   
+- I use left join because I want to join the values in matched numHIV_sel to those of gapminder_sel.
+```{r left join gapminder HIV}
+gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= "country") #join columns, join by comparing country and geo columns. 
+
 head(gapminderHIV) %>% 
+  select("country", `2007`, "geo") %>% 
   knitr::kable()
 
 ```
+  
+- I use head(gapminderHIV) to ensure that the join worked.   
+- I notice that some data is missing, but that's okay for now, we can remove the NAs later on.  
+- The missing data is because these countries in gapminder were not found in the HIV dataset.   
+- If the HIV dataset were missing a value for the number of people with HIV in that country, then only the `2007` column would contain NA, and not the "geo" column.
+
 
 Create a graph:
-- I am interested in HIV rates in the Americas.
-- I want to normalize HIV cases using by population using mutate() in order to better represent the data. 
-```{r}
-
+- I am interested in seeing the HIV rates in the Americas.  
+- First, I need to normalize HIV cases using by population using mutate() in order to better represent and be able to compare the data between countries.   
+```{r table HIV america}
 gapminderHIV_america = gapminderHIV %>% 
   filter(continent =="Americas") %>% 
   mutate(HIVper100000 = `2007`/pop*100000) #calculate HIV cases per 100 000 people
 
-knitr::kable(gapminderHIV_america)
-
-#make a plot
 gapminderHIV_america %>% 
-  ggplot(aes(country, HIVper100000)) + 
-  geom_point(na.rm = TRUE) + #remove NAs
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #use this to write axis text sideways + 
-  labs(x = "Country", y = "HIV frequency per 100 000 people") +  
-  scale_y_continuous(breaks=seq(from = 0, to =1500, by=200)) 
+  select(country, HIVper100000) %>% 
+  knitr::kable()
 
 ```
 
-Section 3: Explore the different types of joins. 
-Right_join:
-```{r}
+I can plot this data:
+```{r gapminder HIV america graph}
+#make a plot
+gapminderHIV_america %>% 
+  ggplot(aes(country, HIVper100000)) + 
+  geom_point(na.rm = TRUE, colour = "red") + #remove NAs
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #use this to write axis text sideways + 
+  labs(x = "Country", y = "HIV frequency per 100 000 people") +  
+  scale_y_continuous(breaks=seq(from = 0, to =1500, by=200)) 
+```
+  
+Conclude:   
+- I can see from the table and graph that Haiti had the highest incidence of HIV per 100 000 people.
+- Cuba has the lowest incidence of HIV per 100 000 people, followed closely by Nicaragua. 
+
+
+Combining these two datasets also allows us to do other interesting analyses, like, whether there is a link between GDP and HIV incidence per 100 000 people.   
+Make a quick plot of this for the year 2007:
+```{r HIV Freq vs. GDP per Capita}
+gapminderHIV_america %>% 
+  ggplot(aes(gdpPercap, HIVper100000)) + 
+  geom_point(na.rm = TRUE, colour = "red", alpha = 0.5) + #remove NAs
+  labs(x = "GDP per Capita", y = "HIV frequency per 100 000 people") +  
+  scale_y_continuous(breaks=seq(from = 0, to =1500, by=200)) +
+  theme_linedraw()+
+  ggtitle("HIV Frequency vs. GDP per Capita in America") +
+  geom_smooth(method = "lm") #add a linear regression line
+```
+  
+- Interestingly, there doesn't seem to be a real significant trend between the GDP per Capita and HIV incidence.  
+- However, there do seem to be a few outlier countries with a lower GDP and high HIV incidence, though this might be due to other variables.
+
+**Section 3**: Explore the different types of joins. 
+
+Trying out right_join:
+```{r right join gapminder HIV}
 gapminderHIV_right = right_join(gapminder_sel, numHIV_sel, by= "country")
 
 head(gapminderHIV_right) %>% 
   knitr::kable()
 ```
+  
+- I see that in right join, we look for matches of values in the numHIV_sel (right) rather than in gapminder_sel (left).  
+- This means that rows for countries found in numHIV_sel, but not in gapminder_sel, are filled with NAs. In this case pop, gdpPercap, and continent are left blank  
+- This was the opposite case when we used left join, where instead the 'geo' and `2007` variables were left blank.
 
 
-
-anti_join: tells us what rows in gapminder don't have a match in the HIV dataset:
-```{r, message = FALSE}
+Trying out anti_join:   
+- anti_join tells us what rows in gapminder don't have a match in the HIV dataset:
+```{r anti join gapminder HIV}
 
 gapminderHIV_anti = anti_join(gapminder_sel, numHIV_sel, by= "country")
 head(gapminderHIV_anti) %>% 
+  select("country") %>% 
   knitr::kable()
 
 nrow(gapminderHIV_anti) 
 ```
-From these results, we can see that 21 countries were found in gapminder that did not have a match in the HIV dataset. 
-Some of the countries are shown in the table above using the head() function. 
+  
+- From these results, we can see that 21 countries were found in gapminder that did not have a match in the HIV dataset.   
+- Some of these countries are shown in the table above using the head() function. 
 
-
-using anti_join once again, we can reverse the order of the dataframes in the command to see what rows in the HIV dataset don't have a match in gapminder:
-```{r}
+Trying out anti_join in reverse order:
+- using anti_join once again, we can reverse the order of the dataframes in the command to see what rows in the HIV dataset don't have a match in gapminder:
+```{r anti join reverse gapminder HIV}
 gapminderHIV_revanti = anti_join(numHIV_sel, gapminder_sel, by = "country" )
 
   head(gapminderHIV_revanti) %>% 
+  select("country", `2007`) %>% 
   knitr::kable()
   
   nrow(gapminderHIV_revanti)
 ```
-We can see that 28 countries are found in the HIV dataset, but not in gapminder. Some of those countries are shown above using the head() function. 
+   
+- We can see that 28 countries are found in the HIV dataset, but not in gapminder. Some of those countries are shown above using the head() function. 
 
 
