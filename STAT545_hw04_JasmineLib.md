@@ -10,7 +10,9 @@ STAT 545 Homework 4
 - Use knitr::kable() to make this table look pretty in your rendered homework.
 - Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
 
-**Join Prompt - Activity \#1 ** - Create a second data frame, complementary to Gapminder. - Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result.
+**Join Prompt - Activity \#1**
+- Create a second data frame, complementary to Gapminder.
+- Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result.
 - Explore the different types of joins.
 
 First, Start by loading packages:
@@ -78,7 +80,7 @@ filter_gapminder %>%
 - Historically, China has had a higher life expectancy than India.
 - We also see an interesting change in years 1952-1962, where China's life expectancy went up, then down, while India's increased (albeit, still remaining below that of China)
 
-We can compare China and Japan
+We can compare life expectancies in China and Japan
 
 ``` r
 filter_gapminder %>% 
@@ -97,7 +99,8 @@ filter_gapminder %>%
 
 ![](STAT545_hw04_JasmineLib_files/figure-markdown_github/China%20vs.%20Japan%20Life%20exp-1.png)
 
-Conclude: - Historically, Japan has had a higher life expectancy than China.
+Conclude:
+- Historically, Japan has had a higher life expectancy than China.
 - In the years 1952-1962, the Japanese life expectancy increased, while that of China nearly stayed the same.
 
 ### Join Prompts (join, merge, look up) Activity \#1
@@ -146,7 +149,8 @@ knitr::kable(head(numHIV_sel))
 
 **Section 2**: Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result.
 
-First, I need to filter gapminder to select data only from 2007. - I create a table with the first few rows here to ensure I filtered the variables I want.
+First, I need to filter gapminder to select data only from 2007.
+- I create a table with the first few rows here to ensure I filtered the variables I want.
 
 ``` r
 gapminder_sel = gapminder %>% 
@@ -200,7 +204,8 @@ head(gapminderHIV) %>%
 -   The missing data is because these countries in gapminder were not found in the HIV dataset.
 -   If the HIV dataset were missing a value for the number of people with HIV in that country, then only the `2007` column would contain NA, and not the "geo" column.
 
-Create a graph: - I am interested in seeing the HIV rates in the Americas.
+Create a graph:
+- I am interested in seeing the HIV rates in the Americas.
 - First, I need to normalize HIV cases using by population using mutate() in order to better represent and be able to compare the data between countries.
 
 ``` r
@@ -259,6 +264,7 @@ Conclude:
 - I can see from the table and graph that Haiti had the highest incidence of HIV per 100 000 people. - Cuba has the lowest incidence of HIV per 100 000 people, followed closely by Nicaragua.
 
 Combining these two datasets also allows us to do other interesting analyses, like, whether there is a link between GDP and HIV incidence per 100 000 people.
+
 Make a quick plot of this for the year 2007:
 
 ``` r
@@ -342,7 +348,8 @@ nrow(gapminderHIV_anti)
 -   From these results, we can see that 21 countries were found in gapminder that did not have a match in the HIV dataset.
 -   Some of these countries are shown in the table above using the head() function.
 
-Trying out anti\_join in reverse order: - using anti\_join once again, we can reverse the order of the dataframes in the command to see what rows in the HIV dataset don't have a match in gapminder:
+Trying out anti\_join in reverse order:
+- using anti\_join once again, we can reverse the order of the dataframes in the command to see what rows in the HIV dataset don't have a match in gapminder:
 
 ``` r
 gapminderHIV_revanti = anti_join(numHIV_sel, gapminder_sel, by = "country" )
