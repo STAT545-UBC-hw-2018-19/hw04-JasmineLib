@@ -83,8 +83,12 @@ The data after selection contains the total number of people living with HIV in 
 numHIV = read_csv(file = "people_living_with_hiv_number_all_ages.csv")
 
 #I only want data from the year 2007. 
-numHIV_sel =numHIV %>% 
-  select(geo, "2007")
+numHIV_sel = numHIV %>% 
+  select(geo, `2007`) %>% 
+  mutate(country = geo) #add a variable called country, to facilitate joining (same variable name)
+
+head(numHIV_sel)
+
 
 ```
 
@@ -107,10 +111,12 @@ Create a new data frame gapminder HIV which joins the gapminder_sel and numHIV_s
 - I use head(gapminderHIV) to ensure that the join worked. 
 - I notice that some data is missing, but that's okay, we can remove the NAs later on.
 ```{r}
-gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= c("country" = "geo")) #left join columns, join by comparing country and geo columns. 
+gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= "country") # join columns, join by comparing country and geo columns. 
 
+gapminderHIV
 head(gapminderHIV) %>% 
   knitr::kable()
+
 ```
 
 Create a graph:
@@ -133,5 +139,40 @@ gapminderHIV_america %>%
   scale_y_continuous(breaks=seq(from = 0, to =1500, by=200)) 
 
 ```
-Explore the different types of joins. Examples of a second data frame you could build:
+
+Section 3: Explore the different types of joins. 
+Right_join:
+```{r}
+gapminderHIV_right = right_join(gapminder_sel, numHIV_sel, by= "country")
+
+head(gapminderHIV_right) %>% 
+  knitr::kable()
+```
+
+
+
+anti_join: tells us what rows in gapminder don't have a match in the HIV dataset:
+```{r, message = FALSE}
+
+gapminderHIV_anti = anti_join(gapminder_sel, numHIV_sel, by= "country")
+head(gapminderHIV_anti) %>% 
+  knitr::kable()
+
+nrow(gapminderHIV_anti) 
+```
+From these results, we can see that 21 countries were found in gapminder that did not have a match in the HIV dataset. 
+Some of the countries are shown in the table above using the head() function. 
+
+
+using anti_join once again, we can reverse the order of the dataframes in the command to see what rows in the HIV dataset don't have a match in gapminder:
+```{r}
+gapminderHIV_revanti = anti_join(numHIV_sel, gapminder_sel, by = "country" )
+
+  head(gapminderHIV_revanti) %>% 
+  knitr::kable()
+  
+  nrow(gapminderHIV_revanti)
+```
+We can see that 28 countries are found in the HIV dataset, but not in gapminder. Some of those countries are shown above using the head() function. 
+
 
