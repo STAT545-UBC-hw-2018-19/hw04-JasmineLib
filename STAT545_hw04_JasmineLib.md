@@ -1,21 +1,36 @@
 STAT545\_hw04\_JasmineLib
 ================
 
-### STAT 545 Homework 4
+STAT 545 Homework 4
+-------------------
 
-Data Reshaping Prompts (and relationship to aggregation)
+#### In this assignment I chose the following two activities:
+
+**Data Reshaping Prompt - Activity \#2: ** - Make a tibble with one row per year and columns for life expectancy for two or more countries.
+- Use knitr::kable() to make this table look pretty in your rendered homework.
+- Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
+
+**Join Prompt - Activity \#1 ** - Create a second data frame, complementary to Gapminder. - Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result.
+- Explore the different types of joins.
+
+First, Start by loading packages:
 
 ``` r
 suppressPackageStartupMessages(library(tidyverse)) 
 suppressPackageStartupMessages(library(gapminder))
 ```
 
+### Data Reshaping Prompts (and relationship to aggregation) - Activity \#2
+
+Section 1: Make a tibble with one row per year and columns for life expectancy for two or more countries.
+
 ``` r
-test = gapminder %>% 
-  select (year, lifeExp, country) %>% 
-  filter (country == "China" | country == "India" | country == "Japan") %>% 
+filter_gapminder = gapminder %>% 
+  select (year, lifeExp, country) %>% #select specific variables of interest
+  filter (country == "China" | country == "India" | country == "Japan" ) %>% #select countries of interest
    spread(key = "country", value = "lifeExp")
-test
+
+filter_gapminder
 ```
 
     ## # A tibble: 12 x 4
@@ -34,14 +49,10 @@ test
     ## 11  2002  72.0  62.9  82.0
     ## 12  2007  73.0  64.7  82.6
 
-``` r
-class(test)
-```
-
-    ## [1] "tbl_df"     "tbl"        "data.frame"
+Section 2: Use knitr::kable() to make this table look pretty in your rendered homework.
 
 ``` r
-test  %>% 
+filter_gapminder  %>% 
   knitr::kable()
 ```
 
@@ -60,8 +71,14 @@ test  %>%
 |  2002|  72.02800|  62.879|  82.000|
 |  2007|  72.96100|  64.698|  82.603|
 
+Section 3: Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
+- I am curious to compare the life expectancy of China and India over time.
+- I plot another line with a slope of 1, intercept (0,0) to help with visualization.
+- Points to the left of this plot signify that India (y-axis) has a higher life expectancy for the year,
+- points on the right signify that China (x-axis) had a higher life expectancy for that year.
+
 ``` r
-test %>%
+filter_gapminder %>%
   ggplot (aes(China, India)) + 
   geom_point(aes(colour = year)) + 
   theme_classic() +
@@ -71,18 +88,16 @@ test %>%
   scale_x_continuous(breaks=seq(30,70, by=5)) +
   geom_abline(mapping = NULL, data = NULL, slope = 1,
   na.rm = FALSE) +
-  theme(aspect.ratio=1)
+  theme(aspect.ratio=1) 
 ```
 
-![](STAT545_hw04_JasmineLib_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](STAT545_hw04_JasmineLib_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
-Join Prompts (join, merge, look up)
+### Join Prompts (join, merge, look up)
 
 Activity \#1
 
 Create a second data frame, complementary to Gapminder. Join this with (part of) Gapminder using a dplyr join function and make some observations about the process and result. Explore the different types of joins. Examples of a second data frame you could build:
-
-One row per country, a country variable and one or more variables with extra info, such as language spoken, NATO membership, national animal, or capitol city. One row per continent, a continent variable and one or more variables with extra info, such as northern versus southern hemisphere.
 
 ``` r
 #Obtained data from: https://www.gapminder.org/data/
@@ -129,18 +144,7 @@ numHIV_sel =numHIV %>%
   select(geo, "2007") #rename the "geo" column to country to make joining easier, and select data for the year 2007. 
   #filter(geo =="Canada" | geo == "Japan" | geo =="India")
  
-class(gapminder$country)
-```
 
-    ## [1] "factor"
-
-``` r
-class(numHIV$geo)
-```
-
-    ## [1] "character"
-
-``` r
 gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= c("country" = "geo")) #left join columns, join by comparing country and geo columns. 
 ```
 
@@ -148,13 +152,29 @@ gapminderHIV = left_join(gapminder_sel, numHIV_sel, by= c("country" = "geo")) #l
     ## coercing into character vector
 
 ``` r
-gapminderHIV %>% 
+head(gapminderHIV) %>% 
+  knitr::kable()
+```
+
+| country     |       pop|   gdpPercap| continent |    2007|
+|:------------|---------:|-----------:|:----------|-------:|
+| Afghanistan |  31889923|    974.5803| Asia      |    3600|
+| Albania     |   3600523|   5937.0295| Europe    |      NA|
+| Algeria     |  33333216|   6223.3675| Africa    |      NA|
+| Angola      |  12420476|   4797.2313| Africa    |  190000|
+| Argentina   |  40301927|  12779.3796| Americas  |   83000|
+| Australia   |  20434176|  34435.3674| Oceania   |   18000|
+
+``` r
+gapminderHIV_america = gapminderHIV %>% 
   filter(continent =="Americas") %>% 
-  mutate(HIVper10000 = `2007`/pop*10000) %>% 
+  mutate(HIVper10000 = `2007`/pop*10000)
+
+gapminderHIV_america %>% 
   ggplot(aes(country, HIVper10000)) + 
   geom_point(na.rm = TRUE) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
   labs(x = "Country", y = "HIV frequency per 10 000 people")
 ```
 
-![](STAT545_hw04_JasmineLib_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](STAT545_hw04_JasmineLib_files/figure-markdown_github/unnamed-chunk-9-1.png)
