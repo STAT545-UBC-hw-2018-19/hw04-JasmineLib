@@ -247,7 +247,7 @@ gapminderHIV_revanti = anti_join(numHIV_sel, gapminder_sel, by = "country" )
 
 
 
-#### Extra activity:3   
+### Join Prompts Extra activity 3   
 - Explore the base R function merge(), which also does joins. Compare and contrast with dplyr joins.
 ```{r}
 gapminderHIV_merge = merge(numHIV_sel, gapminder_sel, by = "country" )

@@ -381,7 +381,7 @@ gapminderHIV_revanti = anti_join(numHIV_sel, gapminder_sel, by = "country" )
 
 -   We can see that 28 countries are found in the HIV dataset, but not in gapminder. Some of those countries are shown above using the head() function.
 
-#### Extra activity:3
+### Join Prompts Extra activity 3
 
 -   Explore the base R function merge(), which also does joins. Compare and contrast with dplyr joins.
 
